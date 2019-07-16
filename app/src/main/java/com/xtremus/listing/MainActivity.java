@@ -5,14 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.xtremus.listing.model.GetListing;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,18 +19,23 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.xtremus.listing.adapters.MainAdapter;
+import com.xtremus.listing.model.GetListing;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Response;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -43,16 +46,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int All_PERM = 123;
     private static final String[] permissions = {
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.GET_ACCOUNTS,
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE
+            Manifest.permission.INTERNET
     };
 
 
@@ -62,10 +56,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private List<GetListing> getListingList;
     private RecyclerView.Adapter adapter;
 
+    private static String instt_id = null;
+    private static int ncc_year = -1;
+    private static String url = "https://www.tsassessors.in/nccwork/API/cadre_sign_up_login/testing.php";
+
+    RadioGroup radioGroup;
+    EditText editText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -81,21 +84,52 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         permissionTask();
 
 
+        recyclerView = findViewById(R.id.main_list);
+
+        getListingList = new ArrayList<>();
+        adapter = new MainAdapter(getApplicationContext(),getListingList);
+
+        linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setAdapter(adapter);
+
+        editText = findViewById(R.id.editText);
+
+        radioGroup = findViewById(R.id.radioGroup);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                Log.d(TAG, "int i = " + i);
+
+                instt_id = editText.getText().toString();
+
+                switch (radioGroup.getCheckedRadioButtonId()) {
+                    case R.id.btn1:
+                        ncc_year = 1;
+                        break;
+                    case R.id.btn2:
+                        ncc_year = 2;
+                        break;
+                    case R.id.btn3:
+                        ncc_year = 3;
+                        break;
 
 
+                }
 
 
+                url = "https://www.tsassessors.in/nccwork/API/cadre_sign_up_login/testing.php?instt_id=" + instt_id + "&ncc_year=" + ncc_year;
+                getData();
 
+            }
+        });
 
-
-
-
-
-
-
-
-
-        getData();
     }
 
     @Override
@@ -125,28 +159,40 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();
+        getListingList.clear();
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url,
+
+             new Response.Listener<JSONArray>() {
+
+
             @Override
             public void onResponse(JSONArray response) {
                 for (int i = 0; i < response.length(); i++) {
+
+
                     try {
                         JSONObject jsonObject = response.getJSONObject(i);
+                        Log.d(TAG,jsonObject.toString());
+                        GetListing getListing =  new GetListing();
+                        getListing.setEnrollmentNo(jsonObject.getString("enrollment_no"));
+                        getListing.setCadetName(jsonObject.getString("cadet_name"));
+                        getListing.setIsIsoUploaded(String.valueOf(jsonObject.getInt("is_iso_uploaded")));
 
-                        GetListing getListing = new GetListing();
-                        getListing.setTitle(jsonObject.getString("title"));
-                        movie.setRating(jsonObject.getInt("rating"));
-                        movie.setYear(jsonObject.getInt("releaseYear"));
+                        getListingList.add(getListing);
 
-                        movieList.add(movie);
                     } catch (JSONException e) {
                         e.printStackTrace();
                         progressDialog.dismiss();
                     }
                 }
+
+
                 adapter.notifyDataSetChanged();
+
                 progressDialog.dismiss();
             }
+
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -154,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 progressDialog.dismiss();
             }
         });
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonArrayRequest);
     }

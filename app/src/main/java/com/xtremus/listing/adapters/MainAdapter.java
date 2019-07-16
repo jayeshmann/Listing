@@ -46,8 +46,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         GetListing getListing = getListingList.get(position);
 
 
-        holder.textEnrollment.setText((CharSequence) getListing.getCadetDetails().subList(0,1));
-        holder.textCadetName.setText((CharSequence) getListing.getCadetDetails().subList(1,2));
+        holder.textEnrollment.setText(getListing.getEnrollmentNo());
+        holder.textCadetName.setText(getListing.getCadetName());
 
     }
 
