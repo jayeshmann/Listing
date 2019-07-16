@@ -5,52 +5,52 @@ package com.xtremus.listing.model;
  * TSA Pvt. Ltd.
  * jayeshmann06@gmail.com
  */
-import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class GetListing {
 
-    @SerializedName("status")
+    @SerializedName("cadet_name")
     @Expose
-    private String status;
-    @SerializedName("cadet_details")
+    private String cadetName;
+    @SerializedName("enrollment_no")
     @Expose
-    private List<CadetDetail> cadetDetails = null;
-    @SerializedName("msg")
+    private String enrollmentNo;
+    @SerializedName("is_iso_uploaded")
     @Expose
-    private String msg;
+    private String isIsoUploaded;
 
-    public String getStatus() {
-        return status;
+    public String getCadetName() {
+        return cadetName;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setCadetName(String cadetName) {
+        this.cadetName = cadetName;
     }
 
-    public List<CadetDetail> getCadetDetails() {
-        return cadetDetails;
+    public String getEnrollmentNo() {
+        return enrollmentNo;
     }
 
-    public void setCadetDetails(List<CadetDetail> cadetDetails) {
-        this.cadetDetails = cadetDetails;
+    public void setEnrollmentNo(String enrollmentNo) {
+        this.enrollmentNo = enrollmentNo;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getIsIsoUploaded() {
+        return isIsoUploaded;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setIsIsoUploaded(String isIsoUploaded) {
+        this.isIsoUploaded = isIsoUploaded;
     }
 
     @Override
     public String toString() {
         return "GetListing{" +
-                "status='" + status + '\'' +
-                ", cadetDetails=" + cadetDetails +
-                ", msg='" + msg + '\'' +
+                "cadetName='" + cadetName + '\'' +
+                ", enrollmentNo='" + enrollmentNo + '\'' +
+                ", isIsoUploaded='" + isIsoUploaded + '\'' +
                 '}';
     }
 }
