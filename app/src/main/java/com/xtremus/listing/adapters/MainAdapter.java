@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xtremus.listing.R;
-import com.xtremus.listing.model.CadetDetail;
 import com.xtremus.listing.model.GetListing;
 
 import java.util.List;
@@ -44,12 +43,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MainAdapter.ViewHolder holder, int position) {
 
-//        GetListing getListing = getListingList.get(position);
-        CadetDetail cadetDetail = getListingList.get(position);
+        GetListing getListing = getListingList.get(position);
 
-        holder.textEnrollment.setText(getListing.getCadetDetails());
-        holder.textCadetName.setText(String.valueOf(movie.getRating()));
-        holder.textYear.setText(String.valueOf(movie.getYear()));
+
+        holder.textEnrollment.setText((CharSequence) getListing.getCadetDetails().subList(0,1));
+        holder.textCadetName.setText((CharSequence) getListing.getCadetDetails().subList(1,2));
+
     }
 
     @Override
