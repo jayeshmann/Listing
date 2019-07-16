@@ -5,18 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.JsonArray;
-import com.xtremus.listing.adapters.MainAdapter;
-import com.xtremus.listing.model.GetListing;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,10 +19,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.xtremus.listing.adapters.MainAdapter;
+import com.xtremus.listing.model.GetListing;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,7 +35,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
@@ -58,10 +56,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private List<GetListing> getListingList;
     private RecyclerView.Adapter adapter;
 
+    private static String instt_id = null;
+    private static int ncc_year = -1;
+    private static String url = "https://www.tsassessors.in/nccwork/API/cadre_sign_up_login/testing.php";
+
+    RadioGroup radioGroup;
+    EditText editText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -91,8 +98,38 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setAdapter(adapter);
 
+        editText = findViewById(R.id.editText);
 
-        getData();
+        radioGroup = findViewById(R.id.radioGroup);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                Log.d(TAG, "int i = " + i);
+
+                instt_id = editText.getText().toString();
+
+                switch (radioGroup.getCheckedRadioButtonId()) {
+                    case R.id.btn1:
+                        ncc_year = 1;
+                        break;
+                    case R.id.btn2:
+                        ncc_year = 2;
+                        break;
+                    case R.id.btn3:
+                        ncc_year = 3;
+                        break;
+
+
+                }
+
+
+                url = "https://www.tsassessors.in/nccwork/API/cadre_sign_up_login/testing.php?instt_id=" + instt_id + "&ncc_year=" + ncc_year;
+                getData();
+
+            }
+        });
+
     }
 
     @Override
@@ -122,9 +159,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();
-        JsonArray jsonArray = 
+        getListingList.clear();
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,"https://www.tsassessors.in/nccwork/API/cadre_sign_up_login/testing.php?instt_id=1&ncc_year=1",
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url,
+
              new Response.Listener<JSONArray>() {
 
 
@@ -151,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
                 adapter.notifyDataSetChanged();
+
                 progressDialog.dismiss();
             }
 
@@ -161,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 progressDialog.dismiss();
             }
         });
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonArrayRequest);
     }
