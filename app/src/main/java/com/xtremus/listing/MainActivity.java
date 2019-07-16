@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.xtremus.listing.model.GetListing;
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         JSONObject jsonObject = response.getJSONObject(i);
 
                         GetListing getListing = new GetListing();
-                        movie.setTitle(jsonObject.getString("title"));
+                        getListing.setTitle(jsonObject.getString("title"));
                         movie.setRating(jsonObject.getInt("rating"));
                         movie.setYear(jsonObject.getInt("releaseYear"));
 
